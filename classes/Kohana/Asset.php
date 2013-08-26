@@ -14,11 +14,15 @@ abstract class Kohana_Asset {
 	 *
 	 * @param   string  $content
 	 * @param   string  $condition
+	 * @param   boolean $notIE Set whether this conditional should run in non-IE browsers
 	 * @return  string
 	 */
-	public static function conditional($content, $condition)
+	public static function conditional($content, $condition, $notIE = false)
 	{
-		return "<!--[if ".$condition."]>\n". $content."\n<![endif]-->";
+		if ($notIE) {
+			return "<!--[if {$condition}]><!-->{$content}<!--<![endif]-->";
+		}
+		return "<!--[if {$condition}]>{$content}<![endif]-->";
 	}
 
 	/**
@@ -30,7 +34,7 @@ abstract class Kohana_Asset {
 	 */
 	public static function fallback($content, $check, $fallback)
 	{
-		return $content."\n".Asset::html_inline(Assets::JAVASCRIPT, "({$check}) || document.write('<script type=\"text/javascript\" src=\"{$fallback}\"><\/script>')");
+		return $content."\n".Asset::html_inline(Assets::JAVASCRIPT, "({$check}) || document.write('<script src=\"{$fallback}\"><\/script>')");
 	}
 
 	/**
@@ -76,7 +80,7 @@ abstract class Kohana_Asset {
 		switch ($type)
 		{
 			case Assets::JAVASCRIPT:
-				$html = "<script type=\"text/javascript\">\n".$content."\n</script>";
+				$html = "<script>\n".$content."\n</script>";
 			break;
 			case Assets::STYLESHEET:
 				$html = "<style>\n".$content."\n</style>";
